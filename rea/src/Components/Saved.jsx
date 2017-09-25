@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Container, Row, Col } from 'reactstrap'
+import { Container, Row, Col, Button } from 'reactstrap'
 
 class Saved extends Component {
   render() {
@@ -7,11 +7,18 @@ class Saved extends Component {
       <Container>
             {
               this.props.savedList.map((feature, featureKey) => {
-                console.log(feature)
                 return (
-                  <div key={featureKey}>
+                  <div key={featureKey} className="div-container">
                     <span>Price:</span><span>{feature.price}</span>
                     <img className="main-image" src={feature.mainImage} alt=""/>
+                    <div className="hidden-button">
+                      <Button 
+                        color="danger"
+                        onClick={() => this.props.removeData(feature)}
+                      >
+                      Remove
+                      </Button>
+                    </div>
                   </div>
                 )
               })
