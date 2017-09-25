@@ -27408,7 +27408,7 @@ exports = module.exports = __webpack_require__(86)(undefined);
 
 
 // module
-exports.push([module.i, ".App {\n  text-align: center;\n}\n\n.App-logo {\n  animation: App-logo-spin infinite 20s linear;\n  height: 80px;\n}\n\n.App-header {\n  background-color: #222;\n  height: 150px;\n  padding: 20px;\n  color: white;\n}\n\n.App-intro {\n  font-size: large;\n}\n\n@keyframes App-logo-spin {\n  from { transform: rotate(0deg); }\n  to { transform: rotate(360deg); }\n}\n", ""]);
+exports.push([module.i, ".App {\n  text-align: center;\n}\n\n.App-logo {\n  animation: App-logo-spin infinite 20s linear;\n  height: 80px;\n}\n\n.App-header {\n  background-color: #222;\n  height: 150px;\n  padding: 20px;\n  color: white;\n}\n\n.App-intro {\n  font-size: large;\n}\n\n.main-image {\n  max-height: 100%;\n  max-width: 100%;\n}\n\n.div-container {\n  border-style: dotted;\n  margin-bottom: 10px;\n  margin-top: 10px;\n}\n\n.div-container:hover > .hidden-button {\n  display: block;\n}\n\n.main-col {\n  border-style: solid;\n  padding: 5px 5px 5px 5px;\n}\n\n.hidden-button {\n  display: none;\n}\n\n@keyframes App-logo-spin {\n  from { transform: rotate(0deg); }\n  to { transform: rotate(360deg); }\n}\n", ""]);
 
 // exports
 
@@ -30564,6 +30564,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var resultsList = [];
+var savedList = [];
+
 /**
  * Use an url to get data through JSON, returns the data.
  * 
@@ -30582,15 +30585,15 @@ var Core = function (_Component) {
     function Core(props) {
         _classCallCheck(this, Core);
 
+        // Get data from json file
         var _this = _possibleConstructorReturn(this, (Core.__proto__ || Object.getPrototypeOf(Core)).call(this, props));
 
         var json_obj = JSON.parse(GetJsonData("https://raw.githubusercontent.com/henrysalas0106/Save-and-Remove-Data/master/rea/data_properties.json"));
-        var resultsList = [];
-        var savedList = [];
+
         // Iterate through the object
         var activeCollections = json_obj;
         Object.keys(activeCollections).map(function (collectionKey) {
-            //console.log(activeCollections)
+
             var features = activeCollections[collectionKey];
             Object.keys(features).map(function (featureKey) {
                 // Get the data needed for this project
@@ -30599,6 +30602,8 @@ var Core = function (_Component) {
 
                 // Allocate the data into a proper object for future use
                 Object.assign(feature, { FeatureID: featureID });
+
+                // Separate data into two different lists: results and saved
                 if (collectionKey === "results") {
                     resultsList = [].concat(_toConsumableArray(resultsList), [feature]);
                 } else if (collectionKey === "saved") {
@@ -30610,10 +30615,57 @@ var Core = function (_Component) {
             resultsList: resultsList,
             savedList: savedList
         };
+        _this.saveData = _this.saveData.bind(_this);
+        _this.removeData = _this.removeData.bind(_this);
         return _this;
     }
 
     _createClass(Core, [{
+        key: 'saveData',
+        value: function saveData(feature) {
+            // Remove from remove list
+            var resultsList = Object.assign([], this.state.resultsList);
+            var flag = null;
+            Object.keys(resultsList).map(function (id) {
+                if (resultsList[id].id === feature.id) {
+                    flag = id;
+                }
+            });
+            resultsList.splice(flag, 1);
+
+            // Save into saved list
+            var savedList = Object.assign([], this.state.savedList);
+            savedList = [].concat(_toConsumableArray(savedList), [feature]);
+
+            this.setState({
+                resultsList: resultsList,
+                savedList: savedList
+            });
+        }
+    }, {
+        key: 'removeData',
+        value: function removeData(feature) {
+
+            // Remove from saved list
+            var savedList = Object.assign([], this.state.savedList);
+            var flag = null;
+            Object.keys(this.state.savedList).map(function (id) {
+                if (savedList[id].id === feature.id) {
+                    flag = id;
+                }
+            });
+            savedList.splice(flag, 1);
+
+            // Saved to results list
+            var resultsList = Object.assign([], this.state.resultsList);
+            resultsList = [].concat(_toConsumableArray(resultsList), [feature]);
+
+            this.setState({
+                resultsList: resultsList,
+                savedList: savedList
+            });
+        }
+    }, {
         key: 'render',
         value: function render() {
             return _react2.default.createElement(
@@ -30624,31 +30676,37 @@ var Core = function (_Component) {
                     null,
                     _react2.default.createElement(
                         _reactstrap.Col,
-                        { sm: '6' },
-                        'Results'
+                        { sm: '6', className: 'main-col' },
+                        _react2.default.createElement(
+                            _reactstrap.Row,
+                            null,
+                            'RESULTS'
+                        ),
+                        _react2.default.createElement(
+                            _reactstrap.Row,
+                            null,
+                            _react2.default.createElement(_Results2.default, {
+                                resultsList: this.state.resultsList,
+                                saveData: this.saveData
+                            })
+                        )
                     ),
                     _react2.default.createElement(
                         _reactstrap.Col,
-                        { sm: '6' },
-                        'Saved Properties'
-                    )
-                ),
-                _react2.default.createElement(
-                    _reactstrap.Row,
-                    null,
-                    _react2.default.createElement(
-                        _reactstrap.Col,
-                        { sm: '6' },
-                        _react2.default.createElement(_Results2.default, {
-                            resultsList: this.state.resultsList
-                        })
-                    ),
-                    _react2.default.createElement(
-                        _reactstrap.Col,
-                        { sm: '6' },
-                        _react2.default.createElement(_Saved2.default, {
-                            savedList: this.state.savedList
-                        })
+                        { sm: '6', className: 'main-col' },
+                        _react2.default.createElement(
+                            _reactstrap.Row,
+                            null,
+                            'SAVED'
+                        ),
+                        _react2.default.createElement(
+                            _reactstrap.Row,
+                            null,
+                            _react2.default.createElement(_Saved2.default, {
+                                savedList: this.state.savedList,
+                                removeData: this.removeData
+                            })
+                        )
                     )
                 )
             );
@@ -30699,10 +30757,42 @@ var Results = function (_Component) {
   _createClass(Results, [{
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
       return _react2.default.createElement(
-        'div',
+        _reactstrap.Container,
         null,
-        'Results'
+        this.props.resultsList.map(function (feature, featureKey) {
+          return _react2.default.createElement(
+            'div',
+            { key: featureKey, className: 'div-container' },
+            _react2.default.createElement(
+              'span',
+              null,
+              'Price:'
+            ),
+            _react2.default.createElement(
+              'span',
+              null,
+              feature.price
+            ),
+            _react2.default.createElement('img', { className: 'main-image', src: feature.mainImage, alt: '' }),
+            _react2.default.createElement(
+              'div',
+              { className: 'hidden-button' },
+              _react2.default.createElement(
+                _reactstrap.Button,
+                {
+                  color: 'primary',
+                  onClick: function onClick() {
+                    return _this2.props.saveData(feature);
+                  }
+                },
+                'Save'
+              )
+            )
+          );
+        })
       );
     }
   }]);
@@ -30751,10 +30841,42 @@ var Saved = function (_Component) {
   _createClass(Saved, [{
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
       return _react2.default.createElement(
-        'div',
+        _reactstrap.Container,
         null,
-        'Saved'
+        this.props.savedList.map(function (feature, featureKey) {
+          return _react2.default.createElement(
+            'div',
+            { key: featureKey, className: 'div-container' },
+            _react2.default.createElement(
+              'span',
+              null,
+              'Price:'
+            ),
+            _react2.default.createElement(
+              'span',
+              null,
+              feature.price
+            ),
+            _react2.default.createElement('img', { className: 'main-image', src: feature.mainImage, alt: '' }),
+            _react2.default.createElement(
+              'div',
+              { className: 'hidden-button' },
+              _react2.default.createElement(
+                _reactstrap.Button,
+                {
+                  color: 'danger',
+                  onClick: function onClick() {
+                    return _this2.props.removeData(feature);
+                  }
+                },
+                'Remove'
+              )
+            )
+          );
+        })
       );
     }
   }]);
